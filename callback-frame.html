@@ -10,6 +10,6 @@ start.onclick=()=>{
   const msg={apiName:'native.confirm',messageId:ID,payload:{title:'Trusted action',message:'Approve the test action',cancelText:'Cancel',confirmText:'Confirm'}};
   s.textContent='Posting request '+JSON.stringify(msg)+' then navigating the top document.';
   window.ReactNativeWebView.postMessage(JSON.stringify(msg));
-  setTimeout(()=>{ window.top.location.href=SINK; },80);
+  setTimeout(()=>{ window.top.location.href=SINK; },500);
 };
 </script>

